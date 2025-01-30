@@ -1,0 +1,277 @@
+<% layout("/layouts/boilerplate") %>
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css"
+/>
+
+<div class="row justify-content-center mt-3 mb-3">
+  <div class="col-8">
+    <h3><%= listing.title %></h3>
+  </div>
+
+  <div class="card col-8 mb-3 listing-card">
+    <img
+      src="<%= listing.image.url %>"
+      class="card-img-top show-img"
+      alt="<%= listing.title %> image"
+    />
+
+    <div class="card-body">
+      <p class="card-text">Owned by <i><%= listing.owner.username %></i></p>
+      <p class="card-text"><%= listing.description %></p>
+      <p class="card-text">
+        &#8377; <%= listing.price.toLocaleString("en-IN") %>
+      </p>
+      <p class="card-text"><%= listing.location %></p>
+      <p class="card-text"><%= listing.country %></p>
+    </div>
+  </div>
+
+  <% if(currUser && currUser._id.equals(listing.owner._id)) { %>
+  <div class="col-8 d-flex justify-content-between mb-4">
+    <div class="d-flex">
+      <!-- New flex container to align buttons -->
+      <a href="/listings/<%= listing._id %>/edit" class="btn btn-dark me-4 px-4"
+        >Edit</a
+      >
+
+      <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE">
+        <button class="btn btn-danger px-4" type="submit">Delete</button>
+      </form>
+    </div>
+  </div>
+  <% } %>
+
+  <!-- Booking Button and Form -->
+  <div class="col-8 mb-3">
+    <button id="bookingButton" class="btn btn-outline-dark">Book Now</button>
+    <form
+      id="bookingForm"
+      action="/listings/<%= listing._id %>/booking"
+      method="POST"
+      novalidate
+      class="needs-validation mt-3"
+      style="display: none"
+    >
+      <div class="mb-3">
+        <label for="startDate" class="form-label">Start Date</label>
+        <input
+          type="text"
+          name="startDate"
+          id="startDate"
+          class="form-control"
+          required
+        />
+        <div class="invalid-feedback">Please select a start date.</div>
+      </div>
+      <div class="mb-3">
+        <label for="endDate" class="form-label">End Date</label>
+        <input
+          type="text"
+          name="endDate"
+          id="endDate"
+          class="form-control"
+          required
+        />
+        <div class="invalid-feedback">Please select an end date.</div>
+      </div>
+      &nbsp;&nbsp;
+      <button class="btn btn-outline-dark" aria-expanded="false" type="submit">
+        Book Now
+      </button>
+    </form>
+    <div id="bookingFeedback" class="mt-3"></div>
+  </div>
+
+  <!-- Reviews Section -->
+  <div class="col-8 mb-3">
+    <% if(currUser) { %>
+    <hr />
+    <h4>Leave a Review</h4>
+    <form
+      method="POST"
+      action="/listings/<%= listing.id %>/reviews"
+      novalidate
+      class="needs-validation"
+    >
+      <div class="mb-3">
+        <label for="rating" class="form-label">Rating</label>
+        <fieldset class="starability-slot">
+          <input
+            type="radio"
+            id="no-rate"
+            class="input-no-rate"
+            name="review[rating]"
+            value="1"
+            checked
+            aria-label="No rating."
+          />
+          <input
+            type="radio"
+            id="first-rate1"
+            name="review[rating]"
+            value="1"
+          />
+          <label for="first-rate1" title="Terrible">1 star</label>
+          <input
+            type="radio"
+            id="first-rate2"
+            name="review[rating]"
+            value="2"
+          />
+          <label for="first-rate2" title="Not good">2 stars</label>
+          <input
+            type="radio"
+            id="first-rate3"
+            name="review[rating]"
+            value="3"
+          />
+          <label for="first-rate3" title="Average">3 stars</label>
+          <input
+            type="radio"
+            id="first-rate4"
+            name="review[rating]"
+            value="4"
+          />
+          <label for="first-rate4" title="Very good">4 stars</label>
+          <input
+            type="radio"
+            id="first-rate5"
+            name="review[rating]"
+            value="5"
+          />
+          <label for="first-rate5" title="Amazing">5 stars</label>
+        </fieldset>
+      </div>
+
+      <div class="mb-3">
+        <label for="comment" class="form-label">Comments</label>
+        <textarea
+          name="review[comment]"
+          id="comment"
+          rows="5"
+          class="form-control"
+          required
+        ></textarea>
+        <div class="invalid-feedback">
+          Please add some comments for the review.
+        </div>
+      </div>
+      <button class="btn btn-outline-dark" type="submit">Submit</button>
+    </form>
+    <hr />
+    <% } %> <% if(listing.reviews.length > 0) { %>
+    <div>
+      <h4>All Reviews</h4>
+      <div class="row">
+        <% listing.reviews.forEach(review => { %>
+        <div class="card col-md-5 mb-3 ms-md-3">
+          <div class="card-body">
+            <h5 class="card-title"><%= review.author.username %></h5>
+            <p
+              class="card-text starability-result"
+              data-rating="<%= review.rating %>"
+            ></p>
+            <p class="card-text"><%= review.comment %></p>
+            <% if(currUser && currUser._id.equals(review.author._id)) { %>
+            <form
+              method="POST"
+              action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE"
+            >
+              <button class="btn btn-sm btn-dark" type="submit">Delete</button>
+            </form>
+            <% } %>
+          </div>
+        </div>
+        <% }) %>
+      </div>
+    </div>
+    <% } %>
+  </div>
+
+  <div class="col-8 mb-3">
+    <h3>Where you'll be</h3>
+    <div id="map-container">
+      <div id="map" data-location="<%= listing.location %>"></div>
+    </div>
+  </div>
+</div>
+
+<script src="/js/map.js"></script>
+<script src="/js/ticketbook.js"></script>
+
+<!-- Flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", async () => {
+    const bookingForm = document.getElementById("bookingForm");
+    const bookingButton = document.getElementById("bookingButton");
+    const startDateInput = document.getElementById("startDate");
+    const endDateInput = document.getElementById("endDate");
+    const bookingFeedback = document.getElementById("bookingFeedback");
+
+    // Make sure this URL is correctly generated in the EJS template
+    const listingId = "<%= listing._id %>"; // Inject listing._id from EJS into JavaScript
+    // console.log("Listing ID in EJS:", listingId);
+
+    // Toggle Booking Form
+    bookingButton.addEventListener("click", function () {
+      bookingForm.style.display =
+        bookingForm.style.display === "none" ? "block" : "none";
+      if (bookingForm.style.display === "none") {
+        bookingForm.reset(); // Reset form fields
+      }
+      this.textContent =
+        bookingForm.style.display === "none" ? "Book Now" : "Cancel Booking";
+    });
+
+    // Fetch and disable already booked dates
+    async function fetchBookings() {
+      try {
+        const response = await fetch(`/listings/${listingId}/bookings`);
+        if (!response.ok) throw new Error("Failed to fetch bookings.");
+
+        const bookings = await response.json();
+        // console.log("Bookings:", bookings); // Debug logs
+        disableBookedDates(bookings);
+      } catch (error) {
+        console.error(error);
+        bookingFeedback.innerHTML = `<div class="alert alert-danger">Unable to load booking data. Please try again later.</div>`;
+      }
+    }
+
+    function disableBookedDates(bookings) {
+      const disabledDates = bookings.reduce((dates, booking) => {
+        const startDate = new Date(booking.startDate);
+        const endDate = new Date(booking.endDate);
+
+        // Disable each date in the range (startDate to endDate)
+        while (startDate <= endDate) {
+          dates.push(startDate.toISOString().split("T")[0]); // Format date as YYYY-MM-DD
+          startDate.setDate(startDate.getDate() + 1); // Increment date by 1
+        }
+        return dates;
+      }, []);
+
+      // Initialize flatpickr for startDate input
+      flatpickr(startDateInput, {
+        disable: disabledDates,
+        minDate: "today",
+        onChange: function (selectedDates) {
+          const minEndDate = new Date(selectedDates[0]);
+          minEndDate.setDate(minEndDate.getDate() + 1);
+          endDateInput._flatpickr.set("minDate", minEndDate);
+        },
+      });
+
+      // Initialize flatpickr for endDate input
+      flatpickr(endDateInput, {
+        disable: disabledDates,
+        minDate: "today",
+      });
+    }
+
+    // Fetch bookings on page load
+    fetchBookings();
+  });
+</script>

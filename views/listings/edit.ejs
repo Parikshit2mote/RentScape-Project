@@ -1,0 +1,108 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="row mt-3">
+  <div class="col-8 offset-2">
+    <h3>Edit your Listing</h3>
+    <form
+      method="POST"
+      action="/listings/<%= listing._id %>?_method=PUT"
+      novalidate
+      class="needs-validation"
+      enctype="multipart/form-data"
+    >
+      <div class="mb-3">
+        <label for="title" class="form-label">Title</label>
+        <input
+          name="listing[title]"
+          value="<%= listing.title%>"
+          type="text"
+          class="form-control"
+          required
+        />
+        <div class="valid-feedback">Title looks good!</div>
+      </div>
+
+      <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <textarea
+          name="listing[description]"
+          type="text"
+          class="form-control"
+          required
+        >
+<%= listing.description%></textarea
+        >
+        <div class="invalid-feedback">Please enter a short Description</div>
+      </div>
+
+      <div class="mb-3">
+        Original Listing Image <br />
+        <img src="<%= originalImageUrl %>" class="custom-image" />
+      </div>
+
+      <div class="mb-3">
+        <label for="image" class="form-label">Upload New Image</label>
+        <input name="listing[image]" type="file" class="form-control" />
+        <!-- <div class="invalid-feedback">Please enter valid link for Image</div>   -->
+      </div>
+
+      <div class="row">
+        <div class="mb-3 col-md-4">
+          <label for="price" class="form-label">Price</label>
+          <input
+            name="listing[price]"
+            value="<%= listing.price%>"
+            type="number"
+            class="form-control"
+            required
+          />
+          <div class="invalid-feedback">Price should be valid</div>
+        </div>
+
+        <div class="mb-3 col-md-8">
+            <label for="category" class="form-label">Category</label>
+            <select name="listing[category]" id="category" class="form-control" required>
+                <option value="" disabled selected>Select a category</option>
+                <option value="Trending" <%= listing.category === 'Trending' ? 'selected' : '' %>>Trending</option>
+                <option value="Rooms" <%= listing.category === 'Rooms' ? 'selected' : '' %>>Rooms</option>
+                <option value="Iconic Cities" <%= listing.category === 'Iconic Cities' ? 'selected' : '' %>>Iconic Cities</option>
+                <option value="Mountains" <%= listing.category === 'Mountains' ? 'selected' : '' %>>Mountains</option>
+                <option value="Castles" <%= listing.category === 'Castles' ? 'selected' : '' %>>Castles</option>
+                <option value="Amazing Pools" <%= listing.category === 'Amazing Pools' ? 'selected' : '' %>>Amazing Pools</option>
+                <option value="Camping" <%= listing.category === 'Camping' ? 'selected' : '' %>>Camping</option>
+                <option value="Beaches" <%= listing.category === 'Beaches' ? 'selected' : '' %>>Beaches</option>
+                <option value="Farms" <%= listing.category === 'Farms' ? 'selected' : '' %>>Farms</option>
+            </select>
+            <div class="invalid-feedback">Please select a valid category</div>
+        </div>
+
+      </div>
+
+      <div class="mb-3">
+        <label for="location" class="form-label">Location</label>
+        <input
+          name="listing[location]"
+          value="<%= listing.location%>"
+          type="text"
+          class="form-control"
+          required
+        />
+        <div class="invalid-feedback">Location should be valid</div>
+      </div>
+
+      <div class="mb-3">
+        <label for="country" class="form-label">Country</label>
+        <input
+          name="listing[country]"
+          value="<%= listing.country%>"
+          type="text"
+          class="form-control"
+          required
+        />
+        <div class="invalid-feedback">Country name should be valid</div>
+      </div>
+
+      <button class="btn btn-dark edit-btn mt-3 mb-3">Create</button>
+    </form>
+  </div>
+</div>

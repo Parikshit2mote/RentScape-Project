@@ -1,0 +1,116 @@
+/* Import Google font - Poppins */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+/* * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    display: flex;
+    padding: 0 10px;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: #5372F0;
+} */
+
+.wrapper {
+    padding: 20px;
+    position: relative;
+    max-width: 1000px;
+    background: #fff;
+    border-radius: 13px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    height: 100px; /* Adjust height as needed */
+}
+
+.icon {
+    position: absolute;
+    top: 50%;
+    height: 30px; /* Smaller arrow height */
+    width: 30px; /* Smaller arrow width */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: #f5f4fd;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Lighter shadow */
+    transition: background 0.3s;
+    z-index: 10;
+    margin: 0 10px; /* Reduced space between arrows and filters */
+}
+
+.icon:first-child {
+    left: 0;
+    transform: translateY(-50%);
+    background: linear-gradient(90deg, #fff 70%, transparent);
+}
+
+.icon:last-child {
+    right: 0;
+    transform: translateY(-50%);
+    background: linear-gradient(-90deg, #fff 70%, transparent);
+}
+
+.icon i {
+    font-size: 1rem; /* Smaller icon size */
+}
+
+.icon:hover {
+    background: #efedfb;
+}
+
+.filters-box {
+    display: flex;
+    gap: 12px; /* Space between filters */
+    align-items: center; /* Center align items */
+    overflow-x: auto; /* Allow horizontal scrolling */
+    scroll-behavior: smooth;
+    padding: 0; /* No padding needed */
+    white-space: nowrap; /* Prevent wrapping */
+    height: 100%; /* Ensure height matches the wrapper */
+}
+
+/* Hide scrollbar for webkit browsers */
+.filters-box::-webkit-scrollbar {
+    height: 0px; /* Hide scrollbar */
+}
+
+.filters-box::-webkit-scrollbar-thumb {
+    background-color: transparent; /* Transparent scrollbar */
+    border-radius: 0px;
+}
+
+.filters-box::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* Hide scrollbar for Firefox */
+.filters-box {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+
+.filter {
+    text-align: center;
+    margin-right: 1.5rem; /* Adjust space between filters */
+    margin-top: 1rem; /* Adjust top margin */
+    opacity: 0.7;
+    flex: 0 0 auto; /* Prevent shrinking */
+}
+
+.filter:hover {
+    opacity: 1;
+    cursor: pointer;
+}
+
+.filter p {
+    font-size: 0.9rem; /* Maintain font size for filter text */
+}
