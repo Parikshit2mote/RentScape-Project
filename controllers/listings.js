@@ -105,3 +105,31 @@ module.exports.destroyListing = async (req, res) => {
   req.flash("success", "Listing Deleted!");
   res.redirect("/listings");
 };
+
+module.exports.searchListings = async (req, res) => {
+  let { q } = req.query;
+  
+  if (!q) {
+    return res.redirect("/listings");
+  }
+
+  // Create a case-insensitive regex pattern for search
+  const searchRegex = new RegExp(q, 'i');
+  
+  // Search in title, description, location, country, and category
+  const searchResults = await Listing.find({
+    $or: [
+      { title: searchRegex },
+      { description: searchRegex },
+      { location: searchRegex },
+      { country: searchRegex },
+      { category: searchRegex }
+    ]
+  });
+
+  res.render("listings/index.ejs", { 
+    allListings: searchResults,
+    searchQuery: q,
+    isSearch: true
+  });
+};

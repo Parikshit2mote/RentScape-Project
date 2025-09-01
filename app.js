@@ -44,6 +44,11 @@ app.use(methodOverride("_method"));
 app.engine("ejs", ejsMate);
 app.use(express.static(path.join(__dirname, "/public")));
 
+// Serve favicon
+app.get('/favicon.ico', (req, res) => {
+  res.sendFile(path.join(__dirname, 'RentScape-logo.ico'));
+});
+
 const store = MongoStore.create({
   mongoUrl: dbUrl,
   crypto: {
@@ -85,18 +90,18 @@ app.use((req, res, next) => {
   next();
 });
 
-// app.get("/" ,(req,res) => {
-//     console.log("HI I am root");
-// });
-
 app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
-app.use("/", userRouter);
 app.use("/listings/:id/booking", bookingRouter); // Route for booking-related actions
+app.use("/", userRouter);
 
-// app.all("*", (req, res, next) => {
-//   next(new ExpressError(404, "Page not found!"));
-// });
+app.get("/", (req, res) => {
+    res.redirect("/listings");
+});
+
+app.all("*", (req, res, next) => {
+  next(new ExpressError(404, "Page not found!"));
+});
 
 // app.use((err, req, res, next) =>{
 //     let {statusCode= 500, message = "Something went wrong!"} = err;

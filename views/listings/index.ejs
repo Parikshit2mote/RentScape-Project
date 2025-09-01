@@ -1,5 +1,16 @@
 <% layout("/layouts/boilerplate") %>
 
+<% if (typeof isSearch !== 'undefined' && isSearch) { %>
+<div class="alert alert-info" role="alert">
+  <i class="fa-solid fa-search"></i>
+  Search results for: "<strong><%= searchQuery %></strong>" 
+  (<%= allListings.length %> listings found)
+  <a href="/listings" class="btn btn-sm btn-outline-secondary ms-3">
+    <i class="fa-solid fa-times"></i> Clear Search
+  </a>
+</div>
+<% } %>
+
 <div id="filters">
   <div class="filter" data-category="All">
     <div><i class="fa-solid fa-list"></i></div>
@@ -101,6 +112,16 @@
   </div>
 </div>
 
+<% if (allListings.length === 0 && typeof isSearch !== 'undefined' && isSearch) { %>
+<div class="text-center py-5">
+  <i class="fa-solid fa-search fa-3x text-muted mb-3"></i>
+  <h4 class="text-muted">No listings found</h4>
+  <p class="text-muted">Try searching with different keywords or browse all listings</p>
+  <a href="/listings" class="btn btn-primary">
+    <i class="fa-solid fa-list"></i> Browse All Listings
+  </a>
+</div>
+<% } else { %>
 <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 mt-3">
   <% for(let listing of allListings) { %>
   <a href="/listings/<%= listing._id %>" class="listing-link">
@@ -122,6 +143,7 @@
   </a>
   <% } %>
 </div>
+<% } %>
 
 <script src="/js/map.js"></script>
 <script src="/js/taxSwitch.js"></script>
