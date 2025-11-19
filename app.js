@@ -27,14 +27,54 @@ const bookingRouter = require("./routes/booking.js"); // Import booking routes
 // const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
 const dbUrl = process.env.ATLASDB_URL;
 
+if (!dbUrl) {
+  console.error("ERROR: ATLASDB_URL environment variable is not set!");
+  process.exit(1);
+}
+
+// MongoDB connection options for Atlas
+const mongooseOptions = {
+  serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
+  socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
+  family: 4, // Use IPv4, skip trying IPv6
+  retryWrites: true,
+  w: 'majority',
+};
+
 main()
   .then(() => {
     console.log("connected to DB");
   })
-  .catch((err) => console.log(err));
+  .catch((err) => {
+    console.error("Failed to connect to MongoDB:", err);
+    // Don't exit in production - let the app try to reconnect
+    if (process.env.NODE_ENV === "production") {
+      console.log("App will continue running and attempt to reconnect...");
+    } else {
+      process.exit(1);
+    }
+  });
 
 async function main() {
-  await mongoose.connect(dbUrl);
+  try {
+    await mongoose.connect(dbUrl, mongooseOptions);
+    
+    // Handle connection events
+    mongoose.connection.on('error', (err) => {
+      console.error('MongoDB connection error:', err);
+    });
+    
+    mongoose.connection.on('disconnected', () => {
+      console.log('MongoDB disconnected. Attempting to reconnect...');
+    });
+    
+    mongoose.connection.on('reconnected', () => {
+      console.log('MongoDB reconnected successfully');
+    });
+  } catch (error) {
+    console.error("MongoDB connection failed:", error);
+    throw error;
+  }
 }
 
 app.set("view engine", "ejs");
@@ -44,7 +84,7 @@ app.use(methodOverride("_method"));
 app.engine("ejs", ejsMate);
 app.use(express.static(path.join(__dirname, "/public")));
 
-// Serve favicon
+// Serve favicon for RentScape
 app.get('/favicon.ico', (req, res) => {
   res.sendFile(path.join(__dirname, 'RentScape-logo.ico'));
 });
@@ -57,7 +97,7 @@ const store = MongoStore.create({
   touchAfter: 24 * 3600,
 });
 
-store.on("error", () => {
+store.on("error", (err) => {
   console.log("ERROR in MONGO SESSION STORE", err);
 });
 
@@ -83,10 +123,19 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
+// Middleware to check database connection
+app.use((req, res, next) => {
+  if (mongoose.connection.readyState !== 1) {
+    // 0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting
+    console.warn(`Database connection state: ${mongoose.connection.readyState}`);
+  }
+  next();
+});
+
 app.use((req, res, next) => {
   res.locals.success = req.flash("success");
   res.locals.error = req.flash("error");
-  res.locals.currUser = req.user;
+  res.locals.currUser = req.user || null; // Ensure currUser is always defined
   next();
 });
 
